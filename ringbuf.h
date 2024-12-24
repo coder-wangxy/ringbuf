@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 #define RINGBUF_CONCAT2(s1, s2) s1##s2
-#define RINGBUF_CONCAT(s1, s2)  RINGBUF_CONCAT2(s1, s2)
+#define RINGBUF_CONCAT(s1, s2) RINGBUF_CONCAT2(s1, s2)
 
 /**
  * @brief 环形缓冲结构(最大支持64KB)
@@ -28,13 +28,14 @@ struct ringbuf {
  * @size_power_of_two: 缓冲区大小（字节数），必须是2的倍数
  *
  */
-#define RINGBUF_DEFINE(name, size_power_of_two) \
-    static unsigned char RINGBUF_CONCAT(name, _buffer4ringbuf_)[size_power_of_two]; \
-    static struct ringbuf name = { \
-        .head = 0, \
-        .tail = 0, \
-        .data = RINGBUF_CONCAT(name, _buffer4ringbuf_), \
-        .mask = size_power_of_two - 1, \
+#define RINGBUF_DEFINE(name, size_power_of_two)                               \
+    static unsigned char RINGBUF_CONCAT(name,                                 \
+                                        _buffer4ringbuf_)[size_power_of_two]; \
+    static struct ringbuf name = {                                            \
+        .head = 0,                                                            \
+        .tail = 0,                                                            \
+        .data = RINGBUF_CONCAT(name, _buffer4ringbuf_),                       \
+        .mask = size_power_of_two - 1,                                        \
     }
 
 /**
@@ -91,7 +92,8 @@ size_t ringbuf_skip(struct ringbuf *p, size_t length);
  * @param p 
  * @return size_t 
  */
-static inline size_t ringbuf_capacity(const struct ringbuf *p) {
+static inline size_t ringbuf_capacity(const struct ringbuf *p)
+{
     return p->mask;
 }
 
@@ -101,7 +103,8 @@ static inline size_t ringbuf_capacity(const struct ringbuf *p) {
  * @param p 
  * @return size_t
  */
-static inline size_t ringbuf_length(const struct ringbuf *p) {
+static inline size_t ringbuf_length(const struct ringbuf *p)
+{
     return (p->tail - p->head) & p->mask;
 }
 
@@ -111,7 +114,8 @@ static inline size_t ringbuf_length(const struct ringbuf *p) {
  * @param p 
  * @return size_t 
  */
-static inline size_t ringbuf_avail(const struct ringbuf *p) {
+static inline size_t ringbuf_avail(const struct ringbuf *p)
+{
     return ringbuf_capacity(p) - ringbuf_length(p);
 }
 

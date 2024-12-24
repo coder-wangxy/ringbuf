@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <string.h>
+
 #include "ringbuf.h"
 
 // Define a ring buffer of size 16 (must be power of 2)
 RINGBUF_DEFINE(mybuf, 16);
 
-int main(void) {
+int main(void)
+{
     char input_data[] = "hello";
     char output_data[16];
     size_t written, read;
