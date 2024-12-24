@@ -1,0 +1,29 @@
+---
+Language: Cpp
+BasedOnStyle: Google
+# Adapt for C code while maintaining Google style
+# Indentation
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+# Line length
+ColumnLimit: 80
+# Braces
+BreakBeforeBraces: Linux
+# Comments
+AlignTrailingComments: true
+SpacesBeforeTrailingComments: 2
+CommentPragmas: '^\\.+'
+# Function declarations
+AllowShortFunctionsOnASingleLine: None
+BinPackParameters: false
+BinPackArguments: false
+# Pointer alignment
+DerivePointerAlignment: false
+PointerAlignment: Right
+# Spacing
+SpaceAfterCStyleCast: false
+SpaceBeforeParens: ControlStatements
+# Chinese comments support
+ReflowComments: false  # Preserve Chinese comment formatting
+---
