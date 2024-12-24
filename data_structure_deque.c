@@ -3,7 +3,10 @@
 
 #include "ringbuf.h"
 
-// 定义16字节的双端队列缓冲区
+/**
+ * @brief 定义16字节的双端队列缓冲区
+ * @note 缓冲区大小必须是2的倍数
+ */
 RINGBUF_DEFINE(deque_buf, 16);
 
 /**
@@ -16,21 +19,21 @@ static size_t deque_push_front(const void *data, size_t length)
 {
     size_t current_length = ringbuf_length(&deque_buf);
 
-    // 检查是否有足够空间
+    /* 检查是否有足够空间 */
     if (current_length + length > 16) {
         return 0;
     }
 
-    // 如果当前有数据，需要先取出
+    /* 如果当前有数据，需要先取出 */
     char temp[16] = {0};
     if (current_length > 0) {
         ringbuf_get(&deque_buf, temp, current_length);
     }
 
-    // 先插入新数据
+    /* 先插入新数据 */
     size_t written = ringbuf_put(&deque_buf, data, length);
 
-    // 再插入原有数据
+    /* 再插入原有数据 */
     if (current_length > 0) {
         ringbuf_put(&deque_buf, temp, current_length);
     }
@@ -138,7 +141,11 @@ int main(void)
 {
     printf("=== 双端队列(Deque)测试 ===\n\n");
 
-    // 测试初始化状态
+    /* 测试初始化状态
+     * 验证：
+     * 1. 双端队列初始为空
+     * 2. 长度为0
+     */
     printf("1. 测试初始化状态\n");
     printf("初始队列长度: %zu\n", deque_length());
     if (deque_length() != 0) {
@@ -147,7 +154,12 @@ int main(void)
     }
     printf("✓ 初始化测试通过\n\n");
 
-    // 测试从尾部插入
+    /* 测试从尾部插入
+     * 验证：
+     * 1. 数据正确写入
+     * 2. 返回写入长度
+     * 3. 队列长度增加
+     */
     printf("2. 测试从尾部插入\n");
     const char *data1 = "First";
     size_t pushed = deque_push_back(data1, strlen(data1));
@@ -157,7 +169,13 @@ int main(void)
         return 1;
     }
 
-    // 测试从头部插入
+    /* 测试从头部插入
+     * 验证：
+     * 1. 数据正确写入队列头部
+     * 2. 返回写入长度
+     * 3. 队列长度增加
+     * 4. 原有数据保持顺序
+     */
     printf("\n3. 测试从头部插入\n");
     const char *data2 = "Second";
     pushed = deque_push_front(data2, strlen(data2));
@@ -219,7 +237,12 @@ int main(void)
     }
     printf("✓ 删除测试通过\n\n");
 
-    // 测试空队列操作
+    /* 测试空队列操作
+     * 验证：
+     * 1. 空队列读取返回0
+     * 2. 不影响队列状态
+     * 3. 错误处理正确
+     */
     printf("6. 测试空队列操作\n");
     memset(buf, 0, sizeof(buf));
     popped = deque_pop_front(buf, sizeof(buf));
@@ -237,9 +260,14 @@ int main(void)
     }
     printf("✓ 空队列测试通过\n\n");
 
-    // 测试队列已满情况
+    /* 测试队列已满情况
+     * 验证：
+     * 1. 超出缓冲区写入被拒绝
+     * 2. 返回实际写入字节数
+     * 3. 不破坏已有数据
+     */
     printf("7. 测试队列已满情况\n");
-    char full_data[20] = "0123456789ABCDEF01";  // 17字节，超过缓冲区大小
+    char full_data[20] = "0123456789ABCDEF01";  /* 17字节，超过缓冲区大小 */
     pushed = deque_push_back(full_data, strlen(full_data));
     printf("尝试从尾部写入超过缓冲区大小的数据: %zu 字节\n", pushed);
     if (pushed >= sizeof(full_data)) {

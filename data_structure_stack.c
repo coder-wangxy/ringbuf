@@ -3,7 +3,10 @@
 
 #include "ringbuf.h"
 
-// 定义16字节的栈缓冲区
+/**
+ * @brief 定义16字节的栈缓冲区
+ * @note 缓冲区大小必须是2的倍数
+ */
 RINGBUF_DEFINE(stack_buf, 16);
 
 /**
@@ -57,7 +60,11 @@ int main(void)
 {
     printf("=== 栈(Stack/LIFO)测试 ===\n\n");
 
-    // 测试初始化状态
+    /* 测试初始化状态
+     * 验证：
+     * 1. 栈初始为空
+     * 2. 深度为0
+     */
     printf("1. 测试初始化状态\n");
     printf("初始栈深度: %zu\n", stack_depth());
     if (stack_depth() != 0) {
@@ -66,7 +73,12 @@ int main(void)
     }
     printf("✓ 初始化测试通过\n\n");
 
-    // 测试入栈操作
+    /* 测试入栈操作
+     * 验证：
+     * 1. 数据正确写入
+     * 2. 返回写入长度
+     * 3. 栈深度增加
+     */
     printf("2. 测试入栈操作\n");
     const char *data1 = "First";
     size_t pushed = stack_push(data1, strlen(data1));
@@ -91,7 +103,12 @@ int main(void)
     }
     printf("✓ 入栈测试通过\n\n");
 
-    // 测试查看栈顶
+    /* 测试查看栈顶
+     * 验证：
+     * 1. 正确读取数据
+     * 2. 数据未被移除
+     * 3. 栈深度不变
+     */
     printf("3. 测试查看栈顶\n");
     char peek_buf[16] = {0};
     size_t peeked = stack_peek(peek_buf, sizeof(peek_buf));
@@ -114,7 +131,12 @@ int main(void)
         return 1;
     }
 
-    // 测试空栈操作
+    /* 测试空栈操作
+     * 验证：
+     * 1. 空栈读取返回0
+     * 2. 不影响栈状态
+     * 3. 错误处理正确
+     */
     printf("\n5. 测试空栈操作\n");
     memset(buf, 0, sizeof(buf));
     popped = stack_pop(buf, sizeof(buf));
@@ -124,9 +146,14 @@ int main(void)
         return 1;
     }
 
-    // 测试栈已满情况
+    /* 测试栈已满情况
+     * 验证：
+     * 1. 超出缓冲区写入被拒绝
+     * 2. 返回实际写入字节数
+     * 3. 不破坏已有数据
+     */
     printf("\n6. 测试栈已满情况\n");
-    char full_data[20] = "0123456789ABCDEF01";  // 17字节，超过缓冲区大小
+    char full_data[20] = "0123456789ABCDEF01";  /* 17字节，超过缓冲区大小 */
     pushed = stack_push(full_data, strlen(full_data));
     printf("尝试写入超过缓冲区大小的数据: %zu 字节\n", pushed);
     if (pushed >= sizeof(full_data)) {

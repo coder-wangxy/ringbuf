@@ -3,7 +3,10 @@
 
 #include "ringbuf.h"
 
-// 定义16字节的队列缓冲区
+/**
+ * @brief 定义16字节的队列缓冲区
+ * @note 缓冲区大小必须是2的倍数
+ */
 RINGBUF_DEFINE(queue_buf, 16);
 
 /**
@@ -52,7 +55,11 @@ int main(void)
 {
     printf("=== 队列(Queue/FIFO)测试 ===\n\n");
 
-    // 测试初始化状态
+    /* 测试初始化状态
+     * 验证：
+     * 1. 队列初始为空
+     * 2. 长度为0
+     */
     printf("1. 测试初始化状态\n");
     printf("初始队列长度: %zu\n", queue_length());
     if (queue_length() != 0) {
@@ -61,7 +68,12 @@ int main(void)
     }
     printf("✓ 初始化测试通过\n\n");
 
-    // 测试入队操作
+    /* 测试入队操作
+     * 验证：
+     * 1. 数据正确写入
+     * 2. 返回写入长度
+     * 3. 队列长度增加
+     */
     printf("2. 测试入队操作\n");
     const char *data1 = "Hello";
     size_t written = queue_enqueue(data1, strlen(data1));
@@ -86,7 +98,12 @@ int main(void)
     }
     printf("✓ 入队测试通过\n\n");
 
-    // 测试查看队首
+    /* 测试查看队首
+     * 验证：
+     * 1. 正确读取数据
+     * 2. 数据未被移除
+     * 3. 队列长度不变
+     */
     printf("3. 测试查看队首\n");
     char peek_buf[16] = {0};
     size_t peeked = queue_peek(peek_buf, sizeof(peek_buf));
@@ -109,7 +126,12 @@ int main(void)
         return 1;
     }
 
-    // 测试空队列操作
+    /* 测试空队列操作
+     * 验证：
+     * 1. 空队列读取返回0
+     * 2. 不影响队列状态
+     * 3. 错误处理正确
+     */
     printf("\n5. 测试空队列操作\n");
     memset(buf, 0, sizeof(buf));
     read = queue_dequeue(buf, sizeof(buf));
@@ -119,9 +141,14 @@ int main(void)
         return 1;
     }
 
-    // 测试队列已满情况
+    /* 测试队列已满情况
+     * 验证：
+     * 1. 超出缓冲区写入被拒绝
+     * 2. 返回实际写入字节数
+     * 3. 不破坏已有数据
+     */
     printf("\n6. 测试队列已满情况\n");
-    char full_data[20] = "0123456789ABCDEF01";  // 17字节，超过缓冲区大小
+    char full_data[20] = "0123456789ABCDEF01";  /* 17字节，超过缓冲区大小 */
     written = queue_enqueue(full_data, strlen(full_data));
     printf("尝试写入超过缓冲区大小的数据: %zu 字节\n", written);
     if (written >= sizeof(full_data)) {
